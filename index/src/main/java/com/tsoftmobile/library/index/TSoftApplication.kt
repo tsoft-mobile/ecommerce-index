@@ -7,7 +7,7 @@ import com.tsoftmobile.library.index.model.data.IndexItem
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
-class TSoftApplication : Application() {
+open class TSoftApplication : Application() {
 
     companion object {
         @JvmStatic
