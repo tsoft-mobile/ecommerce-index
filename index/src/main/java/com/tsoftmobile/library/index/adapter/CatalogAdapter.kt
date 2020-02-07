@@ -13,6 +13,7 @@ import com.tsoftmobile.library.index.Config
 import com.tsoftmobile.library.index.R
 import com.tsoftmobile.library.index.TSoftApplication
 import com.tsoftmobile.library.index.databinding.ItemShowcaseCatalogProductBinding
+import com.tsoftmobile.library.index.model.IndexItemType
 import com.tsoftmobile.library.index.model.data.IndexItem
 import com.tsoftmobile.library.index.util.addVat
 import com.tsoftmobile.library.index.util.encodeTurkishCharactersInUrl
@@ -116,6 +117,9 @@ class CatalogAdapter(
             product.display_vat == "1"
 
 
+        holder.itemView.setOnClickListener {
+            TSoftApplication.rxBus.send(TSoftApplication.RxEvents.onItemClick(IndexItemType.PRODUCT,product))
+        }
 
         if (displayVat)
             priceSellD = addVat(product.price_sell, product.vat)
@@ -189,17 +193,18 @@ class CatalogAdapter(
                     .asGif()
                     .load(imageUrl)
                     .fitCenter()
-                    .override(holder.itemView.width,holder.itemView.height)
+                    .override(holder.itemView.width, holder.itemView.height)
                     .into(imageView)
             }
 
         } else {
             holder.binding?.photo?.let { imageView ->
-                imageView.layout(0,0,0,0)
+                imageView.layout(0, 0, 0, 0)
                 Glide.with(imageView)
                     .asBitmap()
                     .load(imageUrl)
                     .fitCenter()
+                    .override(holder.itemView.width, holder.itemView.height)
                     .into(imageView)
             }
         }

@@ -1,11 +1,13 @@
 package com.tsoftmobile.library.index.adapter
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.tsoftmobile.library.index.R
 import com.tsoftmobile.library.index.model.data.IndexItem
@@ -50,6 +52,13 @@ class ListAdapter(items: ArrayList<IndexItem.OptionsBean>) :
                 typeArr.add(TypeItem(items[position].type, items[position].type_id))
             }
         }
+        holder.container.setBackgroundResource(R.color.colorPrimary)
+
+        holder.title.setTextColor(
+            ColorStateList.valueOf(
+                ContextCompat.getColor(holder.itemView.context, R.color.md_white_1000)
+            )
+        )
     }
 
     override fun getItemCount(): Int {

@@ -54,7 +54,6 @@ class IndexAdapter(list: ArrayList<IndexItem>) :
 
     private inner class HorizontalTypeViewHolder internal constructor(v: View) :
         RecyclerView.ViewHolder(v) {
-        // each data MyItem is just a string in this case
         internal val title: TextView
         internal val viewPager: ViewPager
         internal val circlePageIndicator: WormDotsIndicator
@@ -71,7 +70,6 @@ class IndexAdapter(list: ArrayList<IndexItem>) :
 
     private inner class CatalogTypeViewHolder internal constructor(v: View) :
         RecyclerView.ViewHolder(v) {
-        // each data MyItem is just a string in this case
         internal val title: TextView = v.findViewById<View>(R.id.title) as TextView
         internal val recyclerView: RecyclerView =
             v.findViewById<View>(R.id.recyclerview) as RecyclerView
@@ -86,7 +84,6 @@ class IndexAdapter(list: ArrayList<IndexItem>) :
 
     private inner class ListTypeViewHolder internal constructor(v: View) :
         RecyclerView.ViewHolder(v) {
-        // each data MyItem is just a string in this case
         internal val title: TextView = v.findViewById<View>(R.id.title) as TextView
         internal val recyclerView: RecyclerView =
             v.findViewById<View>(R.id.recyclerview) as RecyclerView

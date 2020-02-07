@@ -10,12 +10,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tsoftmobile.library.index.adapter.IndexAdapter
 import com.tsoftmobile.library.index.databinding.LayoutIndexViewBinding
+import com.tsoftmobile.library.index.model.IndexItemType
 import com.tsoftmobile.library.index.model.Resource
 import com.tsoftmobile.library.index.model.Status
 import com.tsoftmobile.library.index.model.data.IndexItem
 import com.tsoftmobile.library.index.model.response.IndexResponse
 import com.tsoftmobile.library.index.repository.IndexRepository
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 
@@ -31,6 +34,7 @@ class IndexView @JvmOverloads constructor(
     private var mLayoutInflater: LayoutInflater = LayoutInflater.from(mContext)
     private var binding: LayoutIndexViewBinding? = null
 
+    private val compositeDisposable = CompositeDisposable()
 
     private var adapter = IndexAdapter(arrayListOf())
 
@@ -54,16 +58,38 @@ class IndexView @JvmOverloads constructor(
         if (!url.isNullOrEmpty() && !token.isNullOrEmpty()) {
             fetchIndex()
         }
+        compositeDisposable.add(rxOnItemClickListener())
     }
 
-    @SuppressLint("CheckResult")
+    override fun onDetachedFromWindow() {
+        compositeDisposable.clear()
+        super.onDetachedFromWindow()
+    }
+
     fun fetchIndex() {
-        indexRepository.fetchIndex()
-            .subscribeOn(Schedulers.io())
+        compositeDisposable.add(
+            indexRepository.fetchIndex()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    onIndexResult(it)
+                }
+        )
+    }
+
+    private fun rxOnItemClickListener(): Disposable {
+        return TSoftApplication.rxBus.toObservable(TSoftApplication.RxEvents.onItemClick::class.java)
+            .observeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                onIndexResult(it)
+                mOnItemClickListener?.invoke(it.type, it.data)
             }
+    }
+
+    private var mOnItemClickListener: ((type: IndexItemType, data: Any?) -> Unit)? = null
+
+    fun onItemClickListener(listener: (type: IndexItemType, data: Any?) -> Unit) {
+        this.mOnItemClickListener = listener
     }
 
     open fun onIndexResult(result: Resource<IndexResponse>) {

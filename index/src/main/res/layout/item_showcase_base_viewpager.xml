@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -15,7 +16,8 @@
         android:padding="4dp"
         android:textColor="@color/md_grey_600"
         android:textSize="16sp"
-        android:visibility="visible" />
+        android:visibility="visible"
+        tools:text="Title" />
 
     <FrameLayout
         android:layout_width="wrap_content"
@@ -24,15 +26,15 @@
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/view_pager"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            tools:background="@color/colorPrimary" />
 
         <com.tbuonomo.viewpagerdotsindicator.WormDotsIndicator
             android:id="@+id/pagerIndicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
-            android:layout_marginTop="-8dp"
-            android:padding="4dp"
+            android:layout_marginBottom="8dp"
             app:dotsColor="@color/colorPrimary"
             app:dotsCornerRadius="8dp"
             app:dotsSize="12dp"

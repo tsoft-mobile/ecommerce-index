@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tsoftmobile.library.index.R
 import com.tsoftmobile.library.index.TSoftApplication
 import com.tsoftmobile.library.index.adapter.SocialMediaAdapter.SocialMediaType.*
+import com.tsoftmobile.library.index.model.IndexItemType
 import com.tsoftmobile.library.index.model.data.IndexItem
 import com.tsoftmobile.library.index.util.encodeTurkishCharactersInUrl
 import com.tsoftmobile.library.index.util.getWidthHeightWithColumn
@@ -64,183 +65,59 @@ class SocialMediaAdapter(
         holder.image.setOnClickListener(View.OnClickListener {
             when (items[position].platform) {
                 facebook -> {
-                    val facebookIntent = Intent(Intent.ACTION_VIEW)
-                    val _word: String = items[position].type_id
-                    val _id: String = items[position].platform_id ?: ""
-                    var url = ""
-                    url = if (_id.isEmpty() || _id == " ") _word else _id
-                    val facebookUrl = openFacebook(url)
-                    facebookIntent.data = Uri.parse(facebookUrl)
-                    TSoftApplication.applicationContext().startActivity(facebookIntent)
+                    TSoftApplication.rxBus.send(
+                        TSoftApplication.RxEvents.onItemClick(
+                            IndexItemType.FACEBOOK,
+                            items[position]
+                        )
+                    )
                 }
                 google_plus -> {
-                    var google_plus_page_name: String = items[position].type_id
-                    if (google_plus_page_name.substring(
-                            0,
-                            1
-                        ) != "+"
-                    ) // eğer başına + eklenmemişse
-                        google_plus_page_name = "+$google_plus_page_name"
-                    openGPlus(google_plus_page_name)
+
                 }
                 instagram -> {
-                    val instagram_page_name: String = items[position].type_id
-                    openInstagram(instagram_page_name)
+                    TSoftApplication.rxBus.send(
+                        TSoftApplication.RxEvents.onItemClick(
+                            IndexItemType.INSTAGRAM,
+                            items[position]
+                        )
+                    )
+
                 }
-                pinterest -> openPinterest(items[position].type_id)
-                twitter -> openTwitter(items[position].type_id)
-                youtube -> openYoutube(items[position].type_id)
-                tumblr -> openTumblr(items[position].type_id)
-                linkedin -> openLinkedin(items[position].type_id)
+                pinterest -> {
+
+                }
+                twitter -> {
+                    TSoftApplication.rxBus.send(
+                        TSoftApplication.RxEvents.onItemClick(
+                            IndexItemType.TWITTER,
+                            items[position]
+                        )
+                    )
+                }
+                youtube -> {
+                    TSoftApplication.rxBus.send(
+                        TSoftApplication.RxEvents.onItemClick(
+                            IndexItemType.YOUTUBE,
+                            items[position]
+                        )
+                    )
+                }
+                tumblr -> {
+
+                }
+                linkedin -> {
+                    TSoftApplication.rxBus.send(
+                        TSoftApplication.RxEvents.onItemClick(
+                            IndexItemType.LINKEDIN,
+                            items[position]
+                        )
+                    )
+                }
             }
         })
     }
 
-    private fun openFacebook(PageName: String): String { // facebook sayfası açmak için.
-        val FACEBOOK_URL = "https://www.facebook.com/$PageName"
-        val packageManager = TSoftApplication.applicationContext().packageManager
-        return try {
-            val versionCode =
-                packageManager.getPackageInfo("com.facebook.katana", 0).versionCode
-            if (versionCode >= 3002850) { //newer versions of fb app
-                if (PageName.isInteger()) { // id kontrolu yapıp bakılacak.string ise facewebmodal ile aç.
-                    "fb://page/$PageName"
-                } else "fb://facewebmodal/f?href=$FACEBOOK_URL"
-            } else { //older versions of fb app
-                "fb://page/$PageName"
-            }
-        } catch (e: PackageManager.NameNotFoundException) {
-            FACEBOOK_URL //normal web url
-        }
-    }
-
-    private fun openGPlus(profile: String) {
-        try {
-            val intent = Intent(Intent.ACTION_VIEW)
-            val packageManager = TSoftApplication.applicationContext().packageManager
-            try {
-                if (packageManager.getPackageInfo("com.google.android.apps.plus", 0) != null) {
-                    intent.setPackage("com.google.android.apps.plus")
-                    intent.data = Uri.parse("https://plus.google.com/$profile")
-                }
-            } catch (e: PackageManager.NameNotFoundException) { // paket yok ise class name e göre ata ve aç.
-                intent.setClassName(
-                    "com.google.android.apps.plus",
-                    "com.google.android.apps.plus.phone.UrlGatewayActivity"
-                )
-                intent.putExtra("customAppUri", profile)
-                e.printStackTrace()
-            }
-            TSoftApplication.applicationContext().startActivity(intent)
-        } catch (e: ActivityNotFoundException) { // class ta yoksa webde aç.
-            TSoftApplication.applicationContext().startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("https://plus.google.com/$profile/posts")
-                )
-            )
-        }
-    }
-
-    private fun openInstagram(pageName: String) {
-        val uri = Uri.parse("http://instagram.com/_u/$pageName")
-        val instaIntent = Intent(Intent.ACTION_VIEW, uri)
-        instaIntent.setPackage("com.instagram.android")
-        try {
-            TSoftApplication.applicationContext().startActivity(instaIntent)
-        } catch (e: ActivityNotFoundException) {
-            TSoftApplication.applicationContext().startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("http://instagram.com/$pageName")
-                )
-            )
-        }
-    }
-
-    private fun openPinterest(pageName: String) {
-        try {
-            TSoftApplication.applicationContext().startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("pinterest://www.pinterest.com/$pageName")
-                )
-            )
-        } catch (e: Exception) {
-            TSoftApplication.applicationContext().startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("https://www.pinterest.com/$pageName")
-                )
-            )
-        }
-    }
-
-    private fun openTwitter(pageName: String) {
-        try {
-            TSoftApplication.applicationContext().startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("twitter://user?screen_name=$pageName")
-                )
-            )
-        } catch (e: Exception) {
-            TSoftApplication.applicationContext().startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("https://twitter.com/#!/$pageName")
-                )
-            )
-        }
-    }
-
-    private fun openYoutube(pageName: String) {
-        var intent: Intent? = null
-        try {
-            intent = Intent(Intent.ACTION_VIEW)
-            intent.setPackage("com.google.android.youtube")
-            intent.data = Uri.parse("https://www.youtube.com/$pageName")
-            TSoftApplication.applicationContext().startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse("https://www.youtube.com/$pageName")
-            TSoftApplication.applicationContext().startActivity(intent)
-        }
-    }
-
-    private fun openTumblr(pageName: String) {
-        try {
-            TSoftApplication.applicationContext().startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("tumblr://x-callback-url/blog?blogName=$pageName")
-                )
-            )
-        } catch (e: Exception) {
-            TSoftApplication.applicationContext().startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("http://$pageName.tumblr.com/")
-                )
-            )
-        }
-    }
-
-    private fun openLinkedin(pageName: String) {
-        try {
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.setPackage("com.linkedin.android")
-            intent.data = Uri.parse("https://www.linkedin.com/$pageName")
-            TSoftApplication.applicationContext().startActivity(intent)
-        } catch (e: Exception) {
-            TSoftApplication.applicationContext().startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("https://www.linkedin.com/$pageName")
-                )
-            )
-        }
-    }
 
     override fun getItemCount(): Int {
         return items.size
